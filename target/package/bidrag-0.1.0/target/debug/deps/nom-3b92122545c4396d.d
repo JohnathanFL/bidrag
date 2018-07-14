@@ -1,0 +1,15 @@
+/home/oakenbow/Dev/Projects/GLENgine-rs/bidrag/target/package/bidrag-0.1.0/target/debug/deps/libnom-3b92122545c4396d.rlib: /home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/lib.rs /home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/util.rs /home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/internal.rs /home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/macros.rs /home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/methods.rs /home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/bytes.rs /home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/bits.rs /home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/nom.rs /home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/character.rs /home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/stream.rs /home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/str.rs
+
+/home/oakenbow/Dev/Projects/GLENgine-rs/bidrag/target/package/bidrag-0.1.0/target/debug/deps/nom-3b92122545c4396d.d: /home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/lib.rs /home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/util.rs /home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/internal.rs /home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/macros.rs /home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/methods.rs /home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/bytes.rs /home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/bits.rs /home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/nom.rs /home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/character.rs /home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/stream.rs /home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/str.rs
+
+/home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/lib.rs:
+/home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/util.rs:
+/home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/internal.rs:
+/home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/macros.rs:
+/home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/methods.rs:
+/home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/bytes.rs:
+/home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/bits.rs:
+/home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/nom.rs:
+/home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/character.rs:
+/home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/stream.rs:
+/home/oakenbow/.cargo/registry/src/github.com-1ecc6299db9ec823/nom-1.2.4/src/str.rs:
