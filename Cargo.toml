@@ -4,7 +4,3 @@ description = "A simple input-binding system (API-Agnostic)"
 version = "0.1.0"
 authors = ["Johnathan Lee <jfl747076@gmail.com>"]
 license = "MIT"
-
-
-[dependencies]
-glfw = {git = "https://github.com/bjz/glfw-rs.git"}
