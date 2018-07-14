@@ -1,8 +1,0 @@
-/home/oakenbow/Dev/Projects/GLENgine-rs/bidrag/target/package/bidrag-0.1.0/target/debug/build/glfw-sys-a9d684026b00b040/out/include/GLFW/glfw3native.h
-/home/oakenbow/Dev/Projects/GLENgine-rs/bidrag/target/package/bidrag-0.1.0/target/debug/build/glfw-sys-a9d684026b00b040/out/include/GLFW/glfw3.h
-/home/oakenbow/Dev/Projects/GLENgine-rs/bidrag/target/package/bidrag-0.1.0/target/debug/build/glfw-sys-a9d684026b00b040/out/lib/cmake/glfw3/glfw3Config.cmake
-/home/oakenbow/Dev/Projects/GLENgine-rs/bidrag/target/package/bidrag-0.1.0/target/debug/build/glfw-sys-a9d684026b00b040/out/lib/cmake/glfw3/glfw3ConfigVersion.cmake
-/home/oakenbow/Dev/Projects/GLENgine-rs/bidrag/target/package/bidrag-0.1.0/target/debug/build/glfw-sys-a9d684026b00b040/out/lib/cmake/glfw3/glfw3Targets.cmake
-/home/oakenbow/Dev/Projects/GLENgine-rs/bidrag/target/package/bidrag-0.1.0/target/debug/build/glfw-sys-a9d684026b00b040/out/lib/cmake/glfw3/glfw3Targets-debug.cmake
-/home/oakenbow/Dev/Projects/GLENgine-rs/bidrag/target/package/bidrag-0.1.0/target/debug/build/glfw-sys-a9d684026b00b040/out/lib/pkgconfig/glfw3.pc
-/home/oakenbow/Dev/Projects/GLENgine-rs/bidrag/target/package/bidrag-0.1.0/target/debug/build/glfw-sys-a9d684026b00b040/out/lib/libglfw3.a
