@@ -1,7 +1,9 @@
+// TODO: Removable binds
 // TODO: Joysticks
 // TODO: Investigate multi-KB/M support. Could be done in here at least by adding a u8 to all
 // // bindings (Which I will have to anyway for joysticks)
 // TODO: Feature dependant things to auto convert from glfw/sdl2/etc types
+// TODO: Binding keys to functions
 
 use std::collections::{HashMap, BTreeMap};
 use std::sync::mpsc::Receiver;
@@ -9,6 +11,8 @@ use std::ops::Range;
 
 /// Since it's used by both SDL2 and GLFW
 pub type Key = i32;
+pub type Button = i32;
+pub type Axis = i32;
 pub type MouseButton = u8;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -18,20 +22,31 @@ pub enum MouseAxis {
 
 #[derive(Debug, Copy, Clone)]
 pub enum Binding {
-    KBKey(Key), MAxis(MouseAxis), MButton(MouseButton)
+    KBKey(Key), MAxis(MouseAxis), MButton(MouseButton), GPButton(u8, Button), GPAxis(u8, Axis)
 }
 
 
 
 const NUM_MOUSE_BUTTONS: usize = 8;
+const MAX_GAMEPADS: u8 = 16; // Good default. Is also max for GLFW
+const MAX_GP_BUTTONS: u8 =  32; // Seems like a logical max. Humans aren't octopi
+const MAX_GP_AXES: u8 = 32;
+
 /// Each Vec<usize> is mapping to indicies in InputSubsystem->axes
 /// As far as I can tell, this structure SHOULD lead to faster access times by binding, although
 /// it's now a pain in the GLFW to look up binding by axis.
 #[derive(Debug, Clone)]
 struct BindingTree {
+    /// Which Key->(all bound axes)
     keyBindings: BTreeMap<Key, Vec<usize>>, // TODO: Seems like this one could be optimized
+    /// Which button->(all bound axes)
     mouseButtonBindings: [Vec<usize>; NUM_MOUSE_BUTTONS],
-    mouseAxisBindings: [Vec<usize>; 2]
+    /// Which axis->(all bound axes)
+    mouseAxisBindings: [Vec<usize>; 2],
+    /// Which gamepad->which button->(all bound axes)
+    gamepadButtonBindings: Vec<BTreeMap<Button, Vec<usize>>>,
+    /// Which gamepad->which axis->(all bound axes)
+    gamepadAxisBindings: Vec<BTreeMap<Axis, Vec<usize>>>
 }
 
 impl BindingTree {
@@ -39,20 +54,37 @@ impl BindingTree {
         BindingTree {
             keyBindings: BTreeMap::new(),
             // Forgive me rust gods, for I have sinned... greatly.
-            // I blame the lack of collect-to-array
+            // I blame the lack of collect-to-array....
             mouseButtonBindings: [Vec::new(), Vec::new(), Vec::new(), Vec::new(), Vec::new(),
                 Vec::new(), Vec::new(), Vec::new()],
-            mouseAxisBindings: [Vec::new(), Vec::new()]
+            mouseAxisBindings: [Vec::new(), Vec::new()],
+            gamepadButtonBindings: Vec::new(),
+            gamepadAxisBindings: Vec::new(),
+
         }
     }
 
-    fn get_indicies(&self, typeOf: Binding) -> Option<&Vec<usize>> {
-        /// Even if we can't find a key for it, the show must go on!
+    /// Get indices of all axes with this binding
+    fn get_indices(&self, typeOf: Binding) -> Option<&Vec<usize>> {
         match typeOf {
+            // get already returns the correct type of Option
             Binding::KBKey(key) => return self.keyBindings.get(&key),
             Binding::MAxis(axis) => return Some(&self.mouseAxisBindings[axis as usize]),
             Binding::MButton(btn) => return Some(&self.mouseButtonBindings[btn as usize]),
-            _ => panic!("NOT YET IMPLEMENTED!")
+            Binding::GPAxis(padNum, axis) => {
+                if let Some(tree) = self.gamepadAxisBindings[padNum] {
+                    return tree.get(&axis);
+                } else {
+                    return None;
+                }
+            },
+            Binding::GPButton(padNum, btn) => {
+                if let Some(tree) = self.gamepadAxisBindings[padNum] {
+                    return tree.get(&btn);
+                } else {
+                    return None;
+                }
+            }
         }
     }
 
@@ -70,6 +102,19 @@ impl BindingTree {
             },
             Binding::MButton(btn) => {
                 self.mouseButtonBindings[btn as usize].push(index);
+            },
+            Binding::GPAxis(padNum, axis) => {
+                if padNum >= self.gamepadAxisBindings.len() {
+                    self.gamepadAxisBindings.resize(padNum + 1 as usize, BTreeMap::new());
+                }
+
+            },
+            Binding::GPButton(padNum, btn) => {
+                if let Some(tree) = self.gamepadAxisBindings[padNum] {
+                    return tree.get(&btn);
+                } else {
+                    return None;
+                }
             }
         }
     }
@@ -112,7 +157,7 @@ impl InputSubsystem {
 
     /// Update all axes which depend on this key
     pub fn update_kb_bind(&mut self, key: Key, pressed: bool) {
-        if let Some(bindings) = self.axisBindings.get_indicies(Binding::KBKey(key)) {
+        if let Some(bindings) = self.axisBindings.get_indices(Binding::KBKey(key)) {
             for index in bindings {
                 self.axes[*index][1] = self.axes[*index][0];
                 self.axes[*index][0] = PRESSED_LOOKUP[pressed as usize];
@@ -122,14 +167,14 @@ impl InputSubsystem {
 
     /// Update all axes which depend on the mouse's position
     pub fn update_mouseaxes_bind(&mut self, axes: (f64, f64)) {
-        if let Some(bindings) = self.axisBindings.get_indicies(Binding::MAxis(MouseAxis::X)) {
+        if let Some(bindings) = self.axisBindings.get_indices(Binding::MAxis(MouseAxis::X)) {
             let newVal = (axes.0 - self.prevMousePos.0) * self.mouseSens.1;
             for index in bindings {
                 self.axes[*index][1] = self.axes[*index][0];
                 self.axes[*index][0] = newVal  as f32;
             }
         }
-        if let Some(bindings) = self.axisBindings.get_indicies(Binding::MAxis(MouseAxis::Y)) {
+        if let Some(bindings) = self.axisBindings.get_indices(Binding::MAxis(MouseAxis::Y)) {
             let newVal = (axes.1 - self.prevMousePos.1) * self.mouseSens.1;
             for index in bindings {
                 self.axes[*index][1] = self.axes[*index][0];
@@ -142,7 +187,7 @@ impl InputSubsystem {
 
     /// Update all axes bound to the mouse button
     pub fn update_mousebutton_bind(&mut self, btn: MouseButton, pressed: bool) {
-        if let Some(bindings) = self.axisBindings.get_indicies(Binding::MButton(btn)) {
+        if let Some(bindings) = self.axisBindings.get_indices(Binding::MButton(btn)) {
             for index in bindings {
                 self.axes[*index][1] = self.axes[*index][0];
                 self.axes[*index][0] = PRESSED_LOOKUP[pressed as usize];
@@ -177,5 +222,9 @@ impl InputSubsystem {
     }
     pub fn get_delta(&self, index: usize) -> f32 {
         return self.get(index) - self.get_prev(index);
+    }
+
+    pub fn get_down(&self, index: usize, threshhold: Option<f32>) -> bool {
+        return self.get(index) > threshhold.unwrap_or(0.9);
     }
 }
