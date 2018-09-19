@@ -1,7 +1,7 @@
 # bidrag
 A rust library for managing bindable game input. Currently only KB/M, but will have support for joysticks in the future.
 
-Example (Using GLFW):
+Example (Using GLFW, currently outdated):
 ``` rust
 let mut glfw = glfw3::init(glfw3::FAIL_ON_ERRORS).expect("Failed to init GLFW3");
 let (mut window, events) = {
