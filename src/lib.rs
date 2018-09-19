@@ -14,118 +14,86 @@ extern crate newtype;
 
 use std::collections::{HashMap, BTreeMap};
 use std::ops::Range;
+use std::ops::Deref;
 
 
-#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, NewType)]
-#[repr(transparent)]
+#[derive(Debug, Copy, Clone, NewType)]
 pub struct Axis(usize);
 
-
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
-pub enum ControlType {
-    Keyboard, MouseAxis, MouseButton, GamepadButton, GamepadAxis
+pub enum CtrlType {
+    GPAxis, GPButton, MouseAxis, MouseButton, Keyboard
+}
+
+#[derive(Debug, Copy, Clone)]
+#[repr(C)]
+pub enum MouseAxis {
+    X, Y,
+    // TODO: Wheel
 }
 
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub struct Control {
-    ty: ControlType,
-    discriminant: usize, // I.E which gamepad or (if ever implemented) which keyboard
-    control: usize
+    ctrlType: CtrlType, // What kind of device? (Note: Separates axes and buttons)
+    // TODO: Maybe make the determinant 0 be an "update all"?
+    determinant: u64,   // Which device (Gamepad 1,2, etc)
+    ctrlID: u64,        // Which part of that device?
 }
 
 impl Control {
-    pub fn new(ty: ControlType, discriminant: usize, control: usize) -> Control {
-        Control {
-            ty, discriminant, control
-        }
+    pub fn new(determinant: u64, ctrlType: CtrlType, ctrlID: u64) -> Control {
+        return Control {
+            determinant, ctrlType, ctrlID
+        };
     }
 }
 
-
-
-const NUM_MOUSE_BUTTONS: usize = 8;
-const MAX_GAMEPADS: u8 = 16; // Good default. Is also max for GLFW
-const MAX_GP_BUTTONS: u8 =  32; // Seems like a logical max. Humans aren't octopi
-const MAX_GP_AXES: u8 = 32;
-
-/// Each Vec<usize> is mapping to indicies in InputSubsystem->axes
-#[derive(Debug, Clone)]
-struct BindingTree(BTreeMap<Control, Vec<Axis>>);
-
-impl BindingTree {
-    fn new() -> BindingTree {
-        BindingTree(BTreeMap::new())
-    }
-
-    /// Get indices of all axes with this binding
-    fn get_indices(&self, control: &Control) -> &Vec<Axis> {
-        static emptyVec: Vec<Axis> = Vec::new();
-
-        let tree = &self.0;
-
-        return tree.get(control).unwrap_or(&emptyVec);
-    }
-
-    fn add_binding(&mut self, binding: &Control, index: Axis) {
-        let tree = &mut self.0;
-
-        if let Some(indices) = tree.get_mut(binding) {
-            indices.push(index);
-            return;
-        }
-
-        tree.insert(*binding, vec![index]);
-
-    }
-}
 
 #[derive(Debug, Clone)]
 pub struct InputSubsystem {
+    /// For computing relative mouse positions.
     windowSize: (f64, f64),
-
-    /// Mouse input will be done on a relative-to-last basis
+    /// Mouse input will be done on a relative-to-last basis.
     prevMousePos: (f64, f64),
+    /// Mouse sensitivity for X and Y axes, respectively.
     mouseSens: (f64, f64),
-    /// Indexes into this->axes
+    /// Indexes into this->axes.
     axisNames: HashMap<String, Axis>,
-    /// Which thing updates each axis. MUST be kept parallel to this->axes
-    axisBindings: BindingTree,
-    /// The current and previous value of each axis, respectively
+    /// Which control updates which axes.
+    axisBindings: BTreeMap<Control, Vec<Axis>>,
+    /// The current and previous value of each axis, respectively.
     axes: Vec<[f64; 2]>
 }
 
 impl InputSubsystem {
     pub fn new(mouseSens: (f64, f64), windowSize: (f64, f64)) -> InputSubsystem {
-        InputSubsystem{
+        return InputSubsystem{
             windowSize,
             prevMousePos: (0.0, 0.0),
             mouseSens,
             axisNames: HashMap::new(),
-            axisBindings: BindingTree::new(),
+            axisBindings: BTreeMap::new(),
             axes: Vec::new()
-        }
-
+        };
     }
 
-    pub fn update_bindings(&mut self, control: &Control, newVal: f64) {
-        let indices = self.axisBindings.get_indices(control);
-
-        for index in indices {
+    pub fn update_bindings(&mut self, control: Control, newVal: f64) {
+        for index in self.axisBindings.get(&control) {
             self.axes[**index][1] = self.axes[**index][0];
             self.axes[**index][0] = newVal;
         }
     }
 
 
-    pub fn add_binding(&mut self, name: String, boundTo: &Control)-> Axis {
-        let index = Axis(self.axes.len()); //TODO: Able to remove bindings. Will break this
-        // line.
-        self.axes.push([0.0; 2]);
+    pub fn add_binding(&mut self, name: String, boundTo: Control)-> Axis {
+        let index = Axis(self.axes.len()); // TODO: Able to remove bindings. Will break this line.
 
+        self.axes.push([0.0; 2]);
         self.axisNames.insert(name, index);
 
-        self.axisBindings.add_binding(boundTo, index);
-
+        if let Some(vec) = self.axisBindings.get_mut(&boundTo) {
+            vec.push(index);
+        }
 
         return index;
     }
