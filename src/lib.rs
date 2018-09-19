@@ -13,8 +13,6 @@
 extern crate newtype;
 
 use std::collections::{HashMap, BTreeMap};
-use std::ops::Range;
-use std::ops::Deref;
 
 
 #[derive(Debug, Copy, Clone, NewType)]
@@ -78,7 +76,9 @@ impl InputSubsystem {
     }
 
     pub fn update_bindings(&mut self, control: Control, newVal: f64) {
-        for index in self.axisBindings.get(&control) {
+        let emptyVec: Vec<Axis> = Vec::new();
+
+        for index in self.axisBindings.get(&control).unwrap_or(&emptyVec) {
             self.axes[**index][1] = self.axes[**index][0];
             self.axes[**index][0] = newVal;
         }
